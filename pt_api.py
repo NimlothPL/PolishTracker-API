@@ -6,6 +6,19 @@
 import json
 import requests
 from pathlib import Path
+import os
+
+os.system('clear')
+
+class bcolors:
+    PINK = '\033[95m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 loop=True
   
@@ -18,19 +31,30 @@ while loop:
             data = json.load(output)
             for item in data["config"]:
                 api_token = (item['api_token'])
-                print ("Used API-Key: " + api_token)
+                watch_path = (item['watch_path'])
+                print 67 * "-"
+                print ("API Key: " + bcolors.PINK + api_token + bcolors.ENDC)
+                print ("Watch dir: " + bcolors.PINK + watch_path + bcolors.ENDC)
                 loop=False
     else:
         # Create config file
+        print ("Config file is missing.")
         with open("config.json", "w") as json_config_file:
             key = raw_input('Enter API Key (20 character long): ')
-            print "Your API Key is: ", key
+            print "API Key set to: ", key
+            print ""
 
-            path = raw_input('Enter torrent watch directory: ')
-            print "Your Torrent watch directory is: ", path
+            path = raw_input('Enter torrent watch directory (ex. /tmp/): ')
+            print "Torrent watch directory set to: ", path
+            print ""
 
             data = {"config":[{'api_token': key,'watch_path': path}]}
             json.dump(data, json_config_file, indent=4)
+            try:
+                input("Press enter to continue")
+            except SyntaxError:
+                pass
+            os.system('clear')
 
 headers = {'API-Key': api_token}
 
@@ -39,7 +63,11 @@ def get_account_details():
     response = requests.get(api_url_base, headers=headers)
 
     if response.status_code == 200:
-	print json.dumps(response.json(), sort_keys=True, indent=4)
+        print json.dumps(response.json(), sort_keys=True, indent=4)
+        try:
+            input("Press enter to continue")
+        except SyntaxError:
+            pass
     else:
         print (response.status_code)
         print json.dumps(response.json(), sort_keys=True, indent=4)
@@ -56,7 +84,11 @@ def get_torrents_list():
     if response.status_code == 200:
         json_data = json.loads(response.text)
         for item in json_data:
-            print ("ID: "+ str(item['id']) + "     Name: " + str(item['name']))
+            print ("ID: "+ bcolors.BOLD + str(item['id']) + bcolors.ENDC + "     Name: " + bcolors.BOLD + str(item['name']) + bcolors.ENDC)
+        try:
+            input("Press enter to continue")
+        except SyntaxError:
+            pass
     else:
         print (response.status_code)
         print json.dumps(response.json(), sort_keys=True, indent=4)
@@ -68,6 +100,10 @@ def get_torrent_details():
 
     if response.status_code == 200:
         print json.dumps(response.json(), sort_keys=True, indent=4)
+        try:
+            input("Press enter to continue")
+        except SyntaxError:
+            pass
     else:
         print (response.status_code)
         print json.dumps(response.json(), sort_keys=True, indent=4)
@@ -96,7 +132,11 @@ def download_torrent():
         open(path+file,"wb").write(response.content)
 
         if response.status_code == 200:
-            print (json_data['name'] + ' file downloaded to ' + path)
+            print (bcolors.GREEN + json_data['name'] + bcolors.ENDC + ' file downloaded to ' + bcolors.BLUE + path + bcolors.ENDC)
+            try:
+                input("Press enter to continue")
+            except SyntaxError:
+                pass
         else:
             print (response.status_code)
             print json.dumps(response.json(), sort_keys=True, indent=4)
