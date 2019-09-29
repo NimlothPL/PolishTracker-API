@@ -21,7 +21,7 @@ def convert_size(size_bytes):
     size = round(size_bytes / power, 2)
     return "{} {}".format(size, size_name[i])
 
-def get_account_details():
+def account_details():
     api_url_base = 'https://api.pte.nu/users/myprofile'
     response = requests.get(api_url_base, headers=headers)
 
@@ -31,7 +31,7 @@ def get_account_details():
         print (response.status_code)
         print json.dumps(response.json(), sort_keys=True, indent=4)
 
-def get_torrents_list():
+def torrents_list():
     amount = int(input('Number of torrents to return (1-250): '))
 
     if amount > 250:
@@ -48,7 +48,7 @@ def get_torrents_list():
         print (response.status_code)
         print json.dumps(response.json(), sort_keys=True, indent=4)
 
-def get_torrent_details():
+def torrent_details():
     amount = int(input('Please enter Torrent ID: '))
     api_url_base = 'https://api.pte.nu/torrents/torrent/%s' % (amount)
     response = requests.get(api_url_base, headers=headers)
@@ -143,11 +143,11 @@ while loop:
     choice = int(input("Enter your choice [1-5]: "))
 
     if choice==1:
-        get_account_details()
+        account_details()
     elif choice==2:
-        get_torrents_list()
+        torrents_list()
     elif choice==3:
-        get_torrent_details()
+        torrent_details()
     elif choice==4:
         torrent_download()
     elif choice==5:
