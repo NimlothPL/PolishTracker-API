@@ -7,56 +7,19 @@ import json
 import requests
 from pathlib import Path
 import os
+import math
+from colorama import Fore, Back, Style
 
 os.system('clear')
 
-class bcolors:
-    PINK = '\033[95m'
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-
-loop=True
-  
-while loop:
-    config_file = Path("config.json")
-    # Check if config file exists
-    if config_file.is_file():
-        # Get API Key from Config
-        with open('config.json', 'r') as output:
-            data = json.load(output)
-            for item in data["config"]:
-                api_token = (item['api_token'])
-                watch_path = (item['watch_path'])
-                print 67 * "-"
-                print ("API Key: " + bcolors.PINK + api_token + bcolors.ENDC)
-                print ("Watch dir: " + bcolors.PINK + watch_path + bcolors.ENDC)
-                loop=False
-    else:
-        # Create config file
-        print ("Config file is missing.")
-        with open("config.json", "w") as json_config_file:
-            key = raw_input('Enter API Key (20 character long): ')
-            print "API Key set to: ", key
-            print ""
-
-            path = raw_input('Enter torrent watch directory (ex. /tmp/): ')
-            print "Torrent watch directory set to: ", path
-            print ""
-
-            data = {"config":[{'api_token': key,'watch_path': path}]}
-            json.dump(data, json_config_file, indent=4)
-            try:
-                input("Press enter to continue")
-            except SyntaxError:
-                pass
-            os.system('clear')
-
-headers = {'API-Key': api_token}
+def convert_size(size_bytes):
+    if size_bytes == 0:
+        return "0B"
+    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+    i = int(math.floor(math.log(size_bytes, 1024)))
+    power = math.pow(1024, i)
+    size = round(size_bytes / power, 2)
+    return "{} {}".format(size, size_name[i])
 
 def get_account_details():
     api_url_base = 'https://api.pte.nu/users/myprofile'
@@ -64,10 +27,6 @@ def get_account_details():
 
     if response.status_code == 200:
         print json.dumps(response.json(), sort_keys=True, indent=4)
-        try:
-            input("Press enter to continue")
-        except SyntaxError:
-            pass
     else:
         print (response.status_code)
         print json.dumps(response.json(), sort_keys=True, indent=4)
@@ -84,11 +43,7 @@ def get_torrents_list():
     if response.status_code == 200:
         json_data = json.loads(response.text)
         for item in json_data:
-            print ("ID: "+ bcolors.BOLD + str(item['id']) + bcolors.ENDC + "     Name: " + bcolors.BOLD + str(item['name']) + bcolors.ENDC)
-        try:
-            input("Press enter to continue")
-        except SyntaxError:
-            pass
+            print ("ID: "+ Style.BRIGHT + str(item['id']) + Style.NORMAL + "   Size: "+ Style.BRIGHT + str(convert_size(item['size'])) + Style.NORMAL + "   Name: " + Style.BRIGHT + str(item['name']) + Style.NORMAL)
     else:
         print (response.status_code)
         print json.dumps(response.json(), sort_keys=True, indent=4)
@@ -100,15 +55,11 @@ def get_torrent_details():
 
     if response.status_code == 200:
         print json.dumps(response.json(), sort_keys=True, indent=4)
-        try:
-            input("Press enter to continue")
-        except SyntaxError:
-            pass
     else:
         print (response.status_code)
         print json.dumps(response.json(), sort_keys=True, indent=4)
 
-def download_torrent():
+def torrent_download():
     download = int(input('Please enter Torrent ID: '))
     api_url_base = 'https://api.pte.nu/torrents/torrent/%s' % (download)
     response = requests.get(api_url_base, headers=headers)
@@ -132,7 +83,7 @@ def download_torrent():
         open(path+file,"wb").write(response.content)
 
         if response.status_code == 200:
-            print (bcolors.GREEN + json_data['name'] + bcolors.ENDC + ' file downloaded to ' + bcolors.BLUE + path + bcolors.ENDC)
+            print (Fore.GREEN + json_data['name'] + Fore.RESET + ' file downloaded to ' + Fore.BLUE + path + Fore.RESET)
             try:
                 input("Press enter to continue")
             except SyntaxError:
@@ -151,11 +102,46 @@ def print_menu():
     print 67 * "-"
 
 loop=True
-  
+
+while loop:
+    config_file = Path("config.json")
+    # Check if config file exists
+    if config_file.is_file():
+        # Get API Key from Config
+        with open('config.json', 'r') as output:
+            data = json.load(output)
+            for item in data["config"]:
+                api_token = (item['api_token'])
+                watch_path = (item['watch_path'])
+                print 67 * "-"
+                print ("API Key: " + Fore.MAGENTA + api_token + Fore.RESET)
+                print ("Watch dir: " + Fore.MAGENTA + watch_path + Fore.RESET)
+                loop=False
+    else:
+        # Create config file
+        print ("Config file is missing.")
+        with open("config.json", "w") as json_config_file:
+            key = raw_input('Enter API Key (20 character long): ')
+            print "API Key set to: ", key
+            print ""
+
+            path = raw_input('Enter torrent watch directory (ex. /tmp/): ')
+            print "Torrent watch directory set to: ", path
+            print ""
+
+            data = {"config":[{'api_token': key,'watch_path': path}]}
+            json.dump(data, json_config_file, indent=4)
+
+            os.system('clear')
+
+headers = {'API-Key': api_token}
+
+loop=True
+
 while loop:
     print_menu()
     choice = int(input("Enter your choice [1-5]: "))
-     
+
     if choice==1:
         get_account_details()
     elif choice==2:
@@ -163,7 +149,7 @@ while loop:
     elif choice==3:
         get_torrent_details()
     elif choice==4:
-        download_torrent()
+        torrent_download()
     elif choice==5:
         loop=False # This will make the while loop to end as not value of loop is set to False
     else:
