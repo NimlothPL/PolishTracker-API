@@ -83,11 +83,7 @@ def torrent_download():
         open(path+file,"wb").write(response.content)
 
         if response.status_code == 200:
-            print (Fore.GREEN + json_data['name'] + Fore.RESET + ' file downloaded to ' + Fore.BLUE + path + Fore.RESET)
-            try:
-                input("Press enter to continue")
-            except SyntaxError:
-                pass
+            print ('File ' + Fore.GREEN + json_data['name'] + '.torrent' + Fore.RESET + ' created in ' + Fore.GREEN + path + Fore.RESET + ' folder.')
         else:
             print (response.status_code)
             print json.dumps(response.json(), sort_keys=True, indent=4)
@@ -114,8 +110,8 @@ while loop:
                 api_token = (item['api_token'])
                 watch_path = (item['watch_path'])
                 print 67 * "-"
-                print ("API Key: " + Fore.MAGENTA + api_token + Fore.RESET)
-                print ("Watch dir: " + Fore.MAGENTA + watch_path + Fore.RESET)
+                print ("PT v2 API Key:   " + Style.BRIGHT + api_token + Style.NORMAL)
+                print ("Watch Directory: " + Style.BRIGHT + watch_path + Style.NORMAL)
                 loop=False
     else:
         # Create config file
@@ -151,6 +147,6 @@ while loop:
     elif choice==4:
         torrent_download()
     elif choice==5:
-        loop=False # This will make the while loop to end as not value of loop is set to False
+        loop=False
     else:
         raw_input("Wrong option selection. Enter any key to try again..")
