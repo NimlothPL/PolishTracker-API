@@ -1,4 +1,4 @@
 Polish Tracker API script
 
 Use:
-python pt_api.py
+python3 pt_api.py
