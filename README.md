@@ -37,6 +37,15 @@ usage: pt_api.py [-h] [--menu] [--account] [--list LIST] [--torrent TORRENT]
                  [--download DOWNLOAD] [--version]
 
 PolishTracker API script
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --menu               Shows menu.
+  --account            Retrieves information about user account.
+  --list LIST          Number of torrents to return (1-250).
+  --torrent TORRENT    Retrieves information about specific torrent.
+  --download DOWNLOAD  Download specific torrent.
+  --version            show program's version number and exit
 ```
 
 ---
